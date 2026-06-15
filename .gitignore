@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.local
+*.local
+
+packages/api/node_modules/
+packages/web/node_modules/
+packages/web/dist/
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+.vscode/
+.idea/

@@ -1,0 +1,50 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: evaluser
+      POSTGRES_PASSWORD: evalpass
+      POSTGRES_DB: llmeval
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: packages/api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://evaluser:evalpass@postgres:5432/llmeval
+      SCORER_URL: http://scorer:8001
+      PORT: "3001"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+
+  scorer:
+    build:
+      context: packages/scorer
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+
+  web:
+    build:
+      context: packages/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

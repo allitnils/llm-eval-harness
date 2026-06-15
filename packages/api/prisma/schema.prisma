@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  createdAt   DateTime     @default(now())
+  experiments Experiment[]
+}
+
+model Dataset {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime      @default(now())
+  items       DatasetItem[]
+  experiments Experiment[]
+}
+
+model DatasetItem {
+  id        String  @id @default(cuid())
+  datasetId String
+  input     String
+  expected  String?
+  metadata  Json?
+  dataset   Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+}
+
+model Experiment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  datasetId   String
+  createdAt   DateTime @default(now())
+  userId      String?
+  dataset     Dataset  @relation(fields: [datasetId], references: [id])
+  user        User?    @relation(fields: [userId], references: [id])
+  runs        Run[]
+}
+
+model Run {
+  id           String     @id @default(cuid())
+  experimentId String
+  modelId      String
+  status       String     @default("pending")
+  startedAt    DateTime?
+  completedAt  DateTime?
+  config       Json?
+  experiment   Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  results      Result[]
+}
+
+model Result {
+  id        String   @id @default(cuid())
+  runId     String
+  itemId    String
+  output    String
+  scores    Json?
+  latencyMs Int?
+  tokens    Int?
+  createdAt DateTime @default(now())
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+}

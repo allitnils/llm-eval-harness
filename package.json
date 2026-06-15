@@ -1,0 +1,15 @@
+{
+  "name": "llm-eval-harness",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["packages/api", "packages/web"],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "dev": "concurrently \"npm run dev -w packages/api\" \"npm run dev -w packages/web\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.5"
+  }
+}
